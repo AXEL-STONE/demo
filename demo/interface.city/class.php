@@ -119,6 +119,7 @@ class CityInterfaceComponent extends \CBitrixComponent
 	 */
 	protected function abortDataCache()
 	{
+		$this->clearResultCache($this->cacheAddon, md5(serialize($this->arParams)));
 		$this->AbortResultCache();
 	}
 
@@ -127,6 +128,9 @@ class CityInterfaceComponent extends \CBitrixComponent
 		$DELETE_CITY = $request->getQuery('DELETE_CITY');
 		$uriString = $request->getRequestUri();
 		if($DELETE_CITY && is_numeric($DELETE_CITY)) {
+			$uri = new Uri($uriString);
+			$uri->deleteParams(array('DELETE_CITY'));
+
 			$filter = array(
 				'IBLOCK_TYPE' => $this->arParams['IBLOCK_TYPE'],
 				'IBLOCK_ID' => $this->arParams['IBLOCK_ID'],
@@ -136,8 +140,6 @@ class CityInterfaceComponent extends \CBitrixComponent
 			if($isCity) {
 				\CIBlockElement::Delete($isCity['ID']);
 				$this->abortDataCache();
-				$uri = new Uri($uriString);
-				$uri->deleteParams(array('DELETE_CITY'));
 				LocalRedirect($uri->getUri());
 			}
 
@@ -230,11 +232,11 @@ class CityInterfaceComponent extends \CBitrixComponent
 			$this->checkModules();
 			$this->checkParams();
 //			$this->loadCity();
-			$this->deleteCity();
+			$this->getIblockId();
 			$this->executeProlog();
+			$this->deleteCity();
 			if ($this->arParams['AJAX'] == 'Y') $APPLICATION->RestartBuffer();
 			if (!$this->readDataFromCache()) {
-				$this->getIblockId();
 				$this->getResult();
 				$this->putDataToCache();
 				$this->includeComponentTemplate();
