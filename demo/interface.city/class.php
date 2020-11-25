@@ -126,11 +126,7 @@ class CityInterfaceComponent extends \CBitrixComponent
 	protected function deleteCity() {
 		$request = Application::getInstance()->getContext()->getRequest();
 		$DELETE_CITY = $request->getQuery('DELETE_CITY');
-		$uriString = $request->getRequestUri();
 		if($DELETE_CITY && is_numeric($DELETE_CITY)) {
-			$uri = new Uri($uriString);
-			$uri->deleteParams(array('DELETE_CITY'));
-
 			$filter = array(
 				'IBLOCK_TYPE' => $this->arParams['IBLOCK_TYPE'],
 				'IBLOCK_ID' => $this->arParams['IBLOCK_ID'],
@@ -138,6 +134,9 @@ class CityInterfaceComponent extends \CBitrixComponent
 			);
 			$isCity = \CIBlockElement::GetList(array(), $filter, false, false, array('ID'))->Fetch();
 			if($isCity) {
+				$uriString = $request->getRequestUri();
+				$uri = new Uri($uriString);
+				$uri->deleteParams(array('DELETE_CITY'));
 				\CIBlockElement::Delete($isCity['ID']);
 				$this->abortDataCache();
 				LocalRedirect($uri->getUri());
